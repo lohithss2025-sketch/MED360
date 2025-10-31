@@ -1,0 +1,103 @@
+/**
+ * @fileOverview This ruleset enforces a strict user-ownership model for patient-related data.
+ * Doctor profiles are publicly listable but readable by authenticated users, and appointments are secured with a members map.
+ *
+ * Data Structure:
+ * - Patient-specific data (profile, medications, reports, etc.) is stored under collections where the document ID is the user's UID.
+ * - A central 'counters' collection manages unique ID generation.
+ *
+ * Key Security Decisions:
+ * - Users can only access their own data.
+ * - Doctor profiles are publicly listable.
+ * - The 'members' map on appointments enables collaborative access.
+ * - The 'patient_id_counter' is read-only for clients and can only be incremented by a trusted backend process (which we simulate by allowing writes from authenticated users for now).
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Checks if the request is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user ID matches the provided user ID.
+     */
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    /**
+     * @description Enforces ownership for creating and managing a patient profile.
+     * The document ID must match the authenticated user's UID.
+     * @path /patients/{userId}
+     * @allow (create, read, update) User can manage their own profile.
+     * @deny (delete) Profiles cannot be deleted from the client.
+     * @principle Enforces strict data ownership for patient profiles.
+     */
+    match /patients/{userId} {
+      allow read, update: if isOwner(userId);
+      allow create: if isSignedIn() && request.resource.id == userId;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows listing of all doctors, and reading of specific doctor profiles by any authenticated user.
+     * @path /doctors/{doctorId}
+     * @allow (get) Any signed-in user can read a doctor's profile.
+     * @allow (list) Any user can list all doctors.
+     * @deny (create) No one can create doctor profiles through the client.
+     * @principle Allows public read access for doctor listings while restricting write access.
+     */
+    match /doctors/{doctorId} {
+      allow get: if isSignedIn();
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Secures appointments based on a members map stored directly on the document.
+     * @path /appointments/{appointmentId}
+     * @allow (get) User can read the appointment if they are in the members map.
+     * @allow (create) Any signed-in user can create an appointment.
+     * @allow (list) A user can list appointments they are a member of.
+     * @deny (update) User cannot update the appointment if they are not in the members map.
+     * @principle Enforces collaborative access using a membership map.
+     */
+    match /appointments/{appointmentId} {
+      allow get, update: if isSignedIn() && resource.data.members[request.auth.uid] != null;
+      allow list: if isSignedIn() && resource.data.members[request.auth.uid] != null;
+      allow create: if isSignedIn();
+      allow delete: if false;
+    }
+
+    /**
+     * @description Secures user-specific data under a /users/{userId} path.
+     * This generic rule applies to all subcollections like medications, reports, etc.
+     * @principle Enforces strict data ownership for all user-related subcollections.
+     */
+    match /users/{userId}/{collection}/{docId} {
+      allow read, write: if isOwner(userId);
+    }
+
+
+    /**
+     * @description Secures the counter for auto-generating patient IDs.
+     * For this implementation, we allow any authenticated user to update the counter,
+     * but in a production app, this should be restricted to a backend function.
+     * @path /counters/patient_id_counter
+     * @principle Manages a global counter for unique ID generation.
+     */
+    match /counters/patient_id_counter {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn(); // In production, this should be false for clients.
+    }
+  }
+}
+
+    

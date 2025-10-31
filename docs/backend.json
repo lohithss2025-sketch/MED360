@@ -1,0 +1,570 @@
+
+{
+  "entities": {
+    "Patient": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Patient",
+      "type": "object",
+      "description": "Represents a patient in the Med360 system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Patient entity."
+        },
+        "healthId": {
+          "type": "string",
+          "description": "Unique health ID assigned to the patient for record management."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the patient."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the patient."
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "description": "Date of birth of the patient.",
+          "format": "date-time"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the patient.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the patient."
+        },
+        "insuranceDetailsId": {
+          "type": "string",
+          "description": "Reference to InsuranceDetails. (Relationship: Patient 1:1 InsuranceDetails)"
+        }
+      },
+      "required": [
+        "id",
+        "healthId",
+        "firstName",
+        "lastName",
+        "dateOfBirth",
+        "email",
+        "phone"
+      ]
+    },
+    "Doctor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Doctor",
+      "type": "object",
+      "description": "Represents a doctor in the Med360 system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Doctor entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the doctor."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the doctor."
+        },
+        "speciality": {
+          "type": "string",
+          "description": "The doctor's medical speciality."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the doctor.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the doctor."
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "speciality",
+        "email",
+        "phone"
+      ]
+    },
+    "Appointment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Appointment",
+      "type": "object",
+      "description": "Represents an appointment between a patient and a doctor.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Appointment entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to Patient. (Relationship: Patient 1:N Appointment)"
+        },
+        "doctorId": {
+          "type": "string",
+          "description": "Reference to Doctor. (Relationship: Doctor 1:N Appointment)"
+        },
+        "dateTime": {
+          "type": "string",
+          "description": "Date and time of the appointment.",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes for the appointment."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the appointment.",
+          "enum": [
+            "Upcoming",
+            "Completed",
+            "Canceled"
+          ]
+        },
+        "doctorName": {
+          "type": "string"
+        },
+        "doctorSpecialty": {
+          "type": "string"
+        },
+        "doctorAvatar": {
+          "type": "string"
+        },
+        "members": {
+          "type": "object",
+          "description": "A map of user UIDs to their roles for this appointment (e.g., patient, doctor)."
+        },
+        "prescription": {
+          "type": "string",
+          "description": "Prescription details from the doctor for the completed appointment."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "doctorId",
+        "dateTime",
+        "status",
+        "doctorName",
+        "doctorSpecialty",
+        "doctorAvatar",
+        "members"
+      ]
+    },
+    "Medication": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Medication",
+      "type": "object",
+      "description": "Represents a medication prescribed to a patient.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Medication entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to Patient. (Relationship: Patient 1:N Medication)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the medication."
+        },
+        "dosage": {
+          "type": "string",
+          "description": "Dosage of the medication."
+        },
+        "frequency": {
+          "type": "string",
+          "description": "Frequency of medication intake."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Start date of the medication.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "End date of the medication.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "name",
+        "dosage",
+        "frequency",
+        "startDate"
+      ]
+    },
+    "Report": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Report",
+      "type": "object",
+      "description": "Represents a scan or X-ray report.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Report entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to Patient. (Relationship: Patient 1:N Report)"
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "URL where the report file is stored.",
+          "format": "uri"
+        },
+        "reportType": {
+          "type": "string",
+          "description": "Type of report (e.g., Scan, X-ray)."
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "Date when the report was uploaded.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "fileUrl",
+        "reportType",
+        "uploadDate"
+      ]
+    },
+    "InsuranceDetails": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "InsuranceDetails",
+      "type": "object",
+      "description": "Represents insurance policy information for a patient.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the InsuranceDetails entity."
+        },
+        "policyNumber": {
+          "type": "string",
+          "description": "Policy number of the insurance."
+        },
+        "insuranceProvider": {
+          "type": "string",
+          "description": "Name of the insurance provider."
+        },
+        "coverageDetails": {
+          "type": "string",
+          "description": "Details of the insurance coverage."
+        },
+        "expiryDate": {
+          "type": "string",
+          "description": "Expiry date of the insurance policy.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "policyNumber",
+        "insuranceProvider",
+        "coverageDetails",
+        "expiryDate"
+      ]
+    },
+    "Payment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Payment",
+      "type": "object",
+      "description": "Represents a payment made by a patient for consultation or medical services.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Payment entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to Patient. (Relationship: Patient 1:N Payment)"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount paid by the patient."
+        },
+        "paymentDate": {
+          "type": "string",
+          "description": "Date when the payment was made.",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the payment (e.g., Consultation fee, Medical service)."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "amount",
+        "paymentDate",
+        "description"
+      ]
+    },
+    "FitnessData": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FitnessData",
+      "type": "object",
+      "description": "Represents fitness data from a wearable device.",
+      "properties": {
+        "patientId": {
+          "type": "string",
+          "description": "The ID of the patient."
+        },
+        "heartRate": {
+          "type": "number",
+          "description": "Heart rate in beats per minute."
+        },
+        "steps": {
+          "type": "number",
+          "description": "Number of steps taken."
+        },
+        "sleepHours": {
+          "type": "number",
+          "description": "Hours of sleep."
+        },
+        "caloriesBurned": {
+          "type": "number",
+          "description": "Calories burned."
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the data was recorded."
+        }
+      },
+      "required": [
+        "patientId",
+        "heartRate",
+        "steps",
+        "sleepHours",
+        "caloriesBurned",
+        "date"
+      ]
+    },
+    "NutritionPlan": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "NutritionPlan",
+      "type": "object",
+      "description": "Represents a suggested nutrition plan for a patient.",
+      "properties": {
+        "patientId": {
+          "type": "string",
+          "description": "The ID of the patient."
+        },
+        "plan": {
+          "type": "string",
+          "description": "The suggested nutrition plan."
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the plan was generated."
+        }
+      },
+      "required": [
+        "patientId",
+        "plan",
+        "date"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}/patients/{patientId}",
+        "definition": {
+          "entityName": "Patient",
+          "schema": {
+            "$ref": "#/backend/entities/Patient"
+          },
+          "description": "Stores patient profiles. Access is restricted to the user with matching `userId`.  Each patient document is stored under the user's ID, ensuring path-based ownership for easy security rule definition.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user (authenticated user ID)."
+            },
+            {
+              "name": "patientId",
+              "description": "The unique ID of the patient."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/doctors/{doctorId}",
+        "definition": {
+          "entityName": "Doctor",
+          "schema": {
+            "$ref": "#/backend/entities/Doctor"
+          },
+          "description": "Stores doctor profiles. Doctors can be listed, but specific doctor documents are readable by authenticated users.",
+          "params": [
+            {
+              "name": "doctorId",
+              "description": "The unique ID of the doctor."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/appointments/{appointmentId}",
+        "definition": {
+          "entityName": "Appointment",
+          "schema": {
+            "$ref": "#/backend/entities/Appointment"
+          },
+          "description": "Stores appointment data. The members map may be denormalized here for collaborative access control.",
+          "params": [
+            {
+              "name": "appointmentId",
+              "description": "The unique ID of the appointment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/medications/{medicationId}",
+        "definition": {
+          "entityName": "Medication",
+          "schema": {
+            "$ref": "#/backend/entities/Medication"
+          },
+          "description": "Stores medication records for patients.  Access is restricted to the user with matching `userId`.  Each medication document is stored under the user's ID, ensuring path-based ownership for easy security rule definition.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user (authenticated user ID)."
+            },
+            {
+              "name": "medicationId",
+              "description": "The unique ID of the medication."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/reports/{reportId}",
+        "definition": {
+          "entityName": "Report",
+          "schema": {
+            "$ref": "#/backend/entities/Report"
+          },
+          "description": "Stores reports for patients. Access is restricted to the user with matching `userId`.  Each report document is stored under the user's ID, ensuring path-based ownership for easy security rule definition.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user (authenticated user ID)."
+            },
+            {
+              "name": "reportId",
+              "description": "The unique ID of the report."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/insuranceDetails/{insuranceDetailsId}",
+        "definition": {
+          "entityName": "InsuranceDetails",
+          "schema": {
+            "$ref": "#/backend/entities/InsuranceDetails"
+          },
+          "description": "Stores insurance details for patients. Access is restricted to the user with matching `userId`.  Each insurance details document is stored under the user's ID, ensuring path-based ownership for easy security rule definition.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user (authenticated user ID)."
+            },
+            {
+              "name": "insuranceDetailsId",
+              "description": "The unique ID of the insurance details."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/payments/{paymentId}",
+        "definition": {
+          "entityName": "Payment",
+          "schema": {
+            "$ref": "#/backend/entities/Payment"
+          },
+          "description": "Stores payment records for patients. Access is restricted to the user with matching `userId`.  Each payment document is stored under the user's ID, ensuring path-based ownership for easy security rule definition.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user (authenticated user ID)."
+            },
+            {
+              "name": "paymentId",
+              "description": "The unique ID of the payment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/fitnessData/{fitnessDataId}",
+        "definition": {
+          "entityName": "FitnessData",
+          "schema": {
+            "$ref": "#/backend/entities/FitnessData"
+          },
+          "description": "Stores fitness data for patients. Access is restricted to the user with matching `userId`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user (authenticated user ID)."
+            },
+            {
+              "name": "fitnessDataId",
+              "description": "The unique ID for the fitness data entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/nutritionPlans/{nutritionPlanId}",
+        "definition": {
+          "entityName": "NutritionPlan",
+          "schema": {
+            "$ref": "#/backend/entities/NutritionPlan"
+          },
+          "description": "Stores nutrition plans for patients. Access is restricted to the user with matching `userId`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user (authenticated user ID)."
+            },
+            {
+              "name": "nutritionPlanId",
+              "description": "The unique ID for the nutrition plan entry."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to manage patient, doctor, appointment, medication, report, insurance, and payment data for the Med360 application. Prioritization is given to Authorization Independence by avoiding `get()` calls in security rules. \n\nPath-Based Ownership:\n*   The `/users/{userId}/...` collections store user-specific data, ensuring that the `userId` matches the authenticated user's UID.  Access to this data is controlled by the user's ID in the path. \n\nDenormalization:\n*   Denormalization is applied to collaborative data. The `members` map is added to the `/appointments` collection.\n\nSegregation:\n*   Data requiring different access rules (e.g., patient profiles vs. admin roles) are stored in distinct collections.\n\nAccess Modeling:\n*   User-owned data resides under `/users/{userId}` for easy ownership-based security rules.\n*   Collaborative entities use membership maps.\n*   Global roles (e.g., admins) are managed with existence checks in dedicated collections like `/roles_admin/{uid}`.\n\nQAPs:\n*   The structure enables secure `list` operations using path-based ownership and membership maps."
+  }
+}
+
+    
